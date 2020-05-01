@@ -1,0 +1,15 @@
+---
+- name: Our First play for User management
+  hosts: all
+  vars:
+    user_name: gagandeep12
+  tasks:
+    - name: First task for adding user {{user_name}}
+      user: name={{user_name}} state=present
+    - name: Second task for installing package
+      yum:
+        name=ntp
+        state=present
+      register: pkg_out
+    - name: Printing pkg installation output
+      debug: var=pkg_out
