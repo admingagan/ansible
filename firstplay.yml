@@ -11,5 +11,6 @@
         name=ntp
         state=present
       register: pkg_out
+      when: ansible_distribution == "CentOS"
     - name: Printing pkg installation output
       debug: var=pkg_out
