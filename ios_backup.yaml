@@ -1,0 +1,12 @@
+---
+- name: Playbook to take backup of routers
+  hosts: ios
+  gather_facts: no
+
+
+  tasks:
+  - name: BACK UP CONFIG
+    ios_config:
+      backup: yes
+
+# Backup will go under your pwd/backup directory with routername_config_date filename
