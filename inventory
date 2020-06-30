@@ -1,0 +1,14 @@
+[ios]
+myrouter
+#router2
+#router3
+
+[ios:vars]
+ansible_user=gagan
+ansible_password=gagan
+ansible_network_os=ios
+ansible_connection=network_cli
+# If using an enable password add these
+#ansible_become_pass=foo
+#ansible_become=yes
+#ansible_become_method=enable
