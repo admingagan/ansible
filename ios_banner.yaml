@@ -1,0 +1,37 @@
+---
+- hosts: ios
+  gather_facts: no
+
+  tasks:
+
+  - name: CONFIGURE LOGIN BANNER FROM FILE
+    ios_banner:
+      banner: login
+      text: "{{ lookup('file', './raw_banner.cfg') }}"
+      state: present
+
+  - name: CONFIGURE MOTD BANNER DIRECTLY
+    ios_banner:
+      banner: motd
+      text: |
+        ***********************************************************************
+        *                               TEST WARNING
+        *       This system is for authorized use only and may only be
+        *      used for approved purposes. Misuse or misappropriation of
+        *        this system is prohibited and may result in civil and
+        *                      criminal penalties.
+        *      We reserve to audit, access and inspect any communications
+        *       stored or transmitted in accordance with applicable law.
+        *         BY COMPLETING THE LOGIN PROCESS YOU ARE ACKNOWLEDGING
+        *           AND CONSENTING TO THE PROVISIONS OF THIS NOTICE.
+        *          IF YOU ARE NOT AN AUTHORISED USER, DISCONNECT NOW!
+        ************************************************************************#
+      state: present
+
+  - name: SHOW RUN
+    ios_command:
+      commands:
+        - show run
+    register: banner
+
+  - debug: var=banner.stdout_lines
