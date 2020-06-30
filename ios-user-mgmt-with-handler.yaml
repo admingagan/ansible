@@ -1,0 +1,23 @@
+---
+- hosts: ios
+  gather_facts: no
+
+  vars:
+     names:
+       - yogesh
+       - gagan
+       - kulbhushan
+
+  tasks:
+     - name: adding users
+       ios_user:
+         name: "{{ item }}"
+         state: present
+         privilege: 15
+       with_items: "{{ names }}"
+       notify: save
+
+  handlers:
+     - name: save
+       ios_config:
+         save_when: modified
