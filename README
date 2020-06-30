@@ -1,1 +1,55 @@
-This Repository contains Ansible Playbooks and Roles.
+Ansible for Networks
+
+This Repository contains Playbooks for Networks. Currently it is tested on CentOS 7.6 with  Ansible version 2.9, IOSv15.x, Checkpoint R80 and AWS VPC Security group.
+
+Lab Setup (Prerequisite):
+
+General pre-requisites are to have one Ansible Master/Controller node (Preferably CentOS 7.x, but can be any latest Linux machine) with Ansible 2.9, Python, wget, Pip and Git installed.
+
+1) For AWS VPC (Free Lab) :
+        a) Create/Login-into AWS account
+        b) Create User with Access key and Secret Key
+        c) If you have awscli Installed, then run aws configure and provide credentials. Else export ACCESS Key and Secret Key with variable:
+                export AWS_ACCESS_KEY=xxxxxxxxxxxx
+                export AWS_SECRET_KEY=xxxxx-xxxxxx
+        d) Install Boto3 Libarary on Ansible Controller node with the help of pip:
+                pip install boto3
+        e) Run Playbook with Ansible-playbook command
+        
+2) For CheckPoint (Paid Labs):
+        a) Create/Login-Into AWS account
+        b) Create a Checkpoint firewall instance from Ec2- Marketplace by searching "CloudGuard IaaS Next-Gen Firewall with Threat Prevention"
+        c) Select Instance type as c5n.large, with minimum 100Gb disk and default ports opened
+        d) Post creation of Instance login into same with admin/admin
+        e) Go through default setup and configure same with default permissions. Add users and credentials once prompted.
+        f) Enable APIs:
+                To configure the API Server:
+                1. In SmartConsole, go to Manage & Settings > Blades.
+                2. In the Management API section, click Advanced Settings.
+                3. Configure the Startup Settings and the Access Settings (Enable APIs).
+                4. under startup settings: Select Automatic start to automatically start the API server when the Security Management Server starts. 
+                5. Access setting should be "All IP addresses"
+        g) Save the configuration
+        h) Add entries in inventory file once done
+        
+   3) For Cisco IOSv15 (Lab on Local System):
+        a) Download (link given below) and Install GNS3 (2.1) version "https://www.gns3.com/software.
+        b) Second install VMware Workstation pro (link given belo ,version 14 is having some known issues) 
+        c) Third install GNS3 VM (link given below)
+        d) Now open VMware workstation and import GNS3 VM 
+        e) Go to GNS3 GUI, EDIT, PREFERENCE, GNS3 VM --> Tick on Enable the GNS3 VM, apply and save
+        f) Install/Add Network Automation appliance (which is having ansible pre-installed) 
+        g) Add an ethernet switch (with GNS3 vm, not with local PC) and one cisco IOSv router, also add a nat cloud (which will provide a DHCP IP's to all appliances)
+        h) Now on the network appliance (edit /etc/network/interfaces) to have a DHCP IP from NAT CLOUD, stop and start the appliance again and you will see the ip
+        i) take the console of the CISCO IOSv and configure IP and hostname and ping the same from Network appliance console
+               
+        Download Links:
+                https://networkautomationthinknyx.s3.amazonaws.com/Network+Automation/GNS3.VM.VMware.Workstation.2.1.21/GNS3+VM.ova
+                https://networkautomationthinknyx.s3.amazonaws.com/Network+Automation/IOSv_startup_config.img
+                https://networkautomationthinknyx.s3.amazonaws.com/Network+Automation/VMware-workstation-full-15.1.0-13591040.exe
+                https://networkautomationthinknyx.s3.amazonaws.com/Network+Automation/cisco-iosv.gns3a
+                
+                
+    Post installing softwares and doing configurations, update your Ansible Inventory file propoerly and run adhoc commands and playbooks.
+    
+    Adhoc commands and Labs for IOS, are included in ios_adhoc.txt
