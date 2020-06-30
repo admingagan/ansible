@@ -1,0 +1,232 @@
+LABs for Cisco IOS v15
+
+For other IOS versions, download the Cisco IOS images from official website or from below links:
+https://i.srijit.com/gns3images
+https://drive.google.com/drive/folders/1VCPPWOEXBhiHpim07CpmuKdx5MaoM4V6
+
+https://srijit.com/working-cisco-ios-gns3/
+
+Old ones are kept intact for your reference-
+
+    1700 – http://i.srijit.com/CiscoIOS-GNS3
+    2600 – http://i.srijit.com/CiscoIOS-GNS3 
+    2691 – http://i.srijit.com/CiscoIOS-GNS3
+    3640 – http://i.srijit.com/CiscoIOS-GNS3
+    3660 – http://i.srijit.com/CiscoIOS-GNS3
+    3725 – http://i.srijit.com/CiscoIOS-GNS3
+    3745 – http://i.srijit.com/CiscoIOS-GNS3
+    7200 (v15) – http://i.srijit.com/CiscoIOS-GNS3
+    7200p (v15) –http://i.srijit.com/CiscoIOS-GNS3
+    
+==========================
+    
+Start the Lab:
+
+Open GNS3 and VMware.
+
+
+
+
+<h2> Project one: </h2>
+=============
+
+Drag and drop one Ethernetswitch and two VPCS to test GNS3 
+
+Use connector and connect eth0 (vpcs1) to eth0 (Ethernetswitch) and eth1 (Ethernetswitch) to eth0 (vpcs2)
+
+on VPCS1 & 2:
+=============
+
+ip 10.1.1.1 255.255.255.0 (VPCS1 )
+sh ip (VPCS1 )
+
+ip 10.1.1.2 255.255.255.0 (VPCS2)
+sh ip (VPCS2)
+
+ping 10.1.1.1
+ping 10.1.1.2
+
+save
+save
+
+
+
+
+PROJECT2:
+=========
+
+EDIT --> PREFERENCES --> DYNAMIPS --> IOS ROUTERS --> NEW --> NEWIMAGE --> IOS IMAGE (3725 router image) --> 256 RAM 
+
+Under Router --> Installed Router --> DRAG AND DROP TWICE and LINK THEM --> START THE DEVICE AND OPEN CONSOLE
+
+R1:
+===
+exit and you will get the console
+
+sh ip int brief
+conf t
+int f0/0
+ip address 10.1.1.1 255.255.255.0
+no shut
+exit
+int loop 0
+ip address 1.1.1.1 255.255.255.255
+no shut
+end
+sh ip int brief
+wr
+
+R2:
+===
+exit and you will get the console
+
+sh ip int brief
+conf t
+int f0/0
+ip address 10.1.1.2 255.255.255.0
+no shut
+exit
+int loop 0
+ip address 2.2.2.2 255.255.255.255
+no shut
+end
+sh ip int brief
+wr
+
+R1 should ping R2 and viceversa
+
+ENABLE LOOPBACK SHOULD ALSO PING EACH OTHER, PERFORM BELOW STEPS ON BOTH ROUTERS:
+
+conf t
+router ospf 1
+network 0.0.0.0 255.255.255.255 area 0
+end
+sh ip ospf neighbor
+sh ip route
+PING BOTH R1 & R2 WITH LOOPBACK IPS
+wr
+
+
+
+
+
+PROJECT3:
+=========
+
+
+
+- Import apliances now from GUI, ROUTER --> AVAILABLE --> CISCO IOSv --> DRAG --> NEXT --> RUN ON GNS3 VM --> NEXT --> WE NEED CICSO IMAGE AND START UP FILE (see below links in the docs) --> next --> Once done go back to GUI and you will see CISCO IOSv in installed appliances
+
+- Drag two appliances (router) and connected them --> boot them --> Open console
+
+R1:
+===
+
+sh ip int brief
+conf t
+int g0/0
+no shut
+ip address 10.1.1.1 255.255.255.0
+end
+ping 10.1.1.1
+conf t
+host R1
+end
+wr
+
+R2:
+===
+
+sh ip int brief
+conf t
+int g0/0
+no shut
+ip address 10.1.1.2 255.255.255.0
+end
+ping 10.1.1.2
+conf t
+host R2
+end
+wr
+
+NOW PING R1 and R2
+
+
+
+
+
+
+PROJECT4:
+=========
+
+Install Network Automation appliance (which is having ansible pre-installed)
+
+Add an ethernet switch (with GNS3 vm, not with local PC) and one cisco IOSv router, also add a nat cloud (which will provide a DHCP IP's to all appliances)
+
+- Now on the network appliance (edit /etc/network/interfaces) to have a DHCP IP from NAT CLOUD, stop and start the appliance again and you will see the ip
+
+- take the console of the CISCO IOSv and configure IP and hostname and ping the same from Network appliance console
+
+sh ip int brief
+conf t
+int g0/0
+no shut
+ip address 192.168.122.90 255.255.255.0
+end
+
+From network Appliance ping 192.168.122.90
+
+conf t
+host myrouter
+end
+wr
+
+From network Appliance add /etc/hosts with IP to NAME mapping (192.168.122.90 myrouter) and ping myrouter
+
+Now create a user in the CISCO Appliance and create a connection from network applinace (ansible server) to router:
+
+conf t
+username gagan password gagan
+username gagan privilege 15
+line vty 0 4
+transport input all
+login local
+ip domain-name thinknyx.com
+crypto key generate rsa
+ip ssh version 2
+transport input ssh
+exit
+wr
+
+Now go to network appliance and do ssh gagan@myrouter and see if you are able to do ssh or not. If yes then the infrastructure is ready
+
+if ssh version issue
+
+crypto key generate rsa usage-keys label sshkey modulus 768
+ip ssh version 2
+
+
+=========
+
+Now define ansible inventory and ad-hoc test from network appliance (ansible):
+
+ansible "*" -m raw -a "show version" 
+ansible "*" -m raw -a "show run"  | grep -i username 
+ansible "*" -m raw -a "show run"  | grep -i 'changed\|username'
+ansible "*" -m raw -a "show mac address-table" 
+ansible "*" -m raw -a "show arp" 
+
+
+ansible "*" -c local -m ios_command -a "commands='show version'" 
+ansible "*" -c local -m ios_ping -a "dest='192.168.122.76'" 
+ansible "*" -c local -m ios_user -a "name=test nopassword=yes state=present" 
+ansible "*" -c local -m ios_command -a "commands='show version | in uptime'"  | grep uptime
+
+ansible "*" -c local -m ios_banner -a "banner=login text='hello all'" 
+ansible "*" -c local -m ios_banner -a "banner=exec text='hello all again'" 
+
+
+
+
+=====================================================
+
