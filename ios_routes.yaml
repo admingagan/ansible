@@ -1,0 +1,23 @@
+---
+- name: Configure Static routing on IOS
+  hosts: ios
+  tasks:
+
+  - name: configure static route
+    ios_static_route:
+      prefix: 10.0.0.0
+      mask: 255.255.255.0
+      next_hop: 10.0.0.1
+
+  - name: Add static route aggregates
+    ios_static_route:
+      aggregate:
+        - { prefix: 172.16.32.0, mask: 255.255.255.0, next_hop: 10.0.0.8 }
+        - { prefix: 172.16.33.0, mask: 255.255.255.0, next_hop: 10.0.0.8 }
+
+#  - name: Remove static route aggregates
+#    ios_static_route:
+#      aggregate:
+#        - { prefix: 172.16.32.0, mask: 255.255.255.0, next_hop: 10.0.0.8 }
+#      state: absent
+
