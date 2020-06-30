@@ -1,0 +1,22 @@
+---
+- name: "Create and associate production DMZ network ACL with DMZ subnets"
+  hosts: localhost
+  tasks:
+    - name: ec2 nacl
+      ec2_vpc_nacl:
+        vpc_id: vpc-07e3b3af9b264e7ad
+        name: ansible-nacl
+        region: us-east-2
+        subnets: ['vpc-07e3b3af9b264e7ad', 'subnet-084a815ef77cd570f', 'subnet-0667b707728dee814' ]
+        tags:
+          Description: production DMZ
+        ingress:
+        # rule no, protocol, allow/deny, cidr, icmp_type, icmp_code,
+        #                                             port from, port to
+          - [100, 'tcp', 'allow', '0.0.0.0/0', null, null, 22, 22]
+          - [200, 'tcp', 'allow', '0.0.0.0/0', null, null, 80, 80]
+          - [300, 'icmp', 'deny', '0.0.0.0/0', 0, 8]
+#          - [400, 'tcp', 'allow', '0.0.0.0/0', null, null, 443, 443]
+        egress:
+          - [100, 'all', 'allow', '0.0.0.0/0', null, null, null, null]
+        state: 'present'
