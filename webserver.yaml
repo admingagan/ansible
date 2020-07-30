@@ -1,4 +1,4 @@
-- name: Apache webserver deployment
+- name: Apache webserver1 deployment
   hosts: all
   vars:
     webpkg: httpd
