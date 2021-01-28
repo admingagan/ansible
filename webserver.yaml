@@ -25,7 +25,7 @@
 
 # Configuring default Apache file
   - name: Configuring Apache configuration files
-    copy: dest={{webfile}} content="<h1>Welcome to the world of DevOps by Gagandeep Singh!</h1>"
+    copy: dest={{webfile}} content="<h1>Welcome to the world of DevOps by Gagandeep Singh - v2!</h1>"
     ignore_errors: true
 
   handlers:
